@@ -17,9 +17,10 @@ public class Tile {
     private ArrayList<Entity> entities;
     private boolean[][] walls;
     private Chunk chunk;
-    private int size = 32;
+    private int size;
     
-    public Tile(Loc loc, Chunk chunk){
+    public Tile(Loc loc, int size, Chunk chunk){
+        this.size = size;
         this.chunk = chunk;
         this.loc = loc;
         walls = new boolean[size][size];
@@ -30,8 +31,17 @@ public class Tile {
         return size;
     }
     
+    public Chunk getChunk(){
+        return chunk;
+    }
+    
+    private int random_door(){
+        return (int)(Math.random()*(size)*1.2-size/5)-1; // (1-size/2 to size-1)
+    }
+    
     private void generate(){
         boolean[][] neighbor;
+        Chunk c;
         int start, doorWidth;
         
         for(int i = 0; i < size; i++){
@@ -44,64 +54,88 @@ public class Tile {
         if (loc.getY() > 0){
             neighbor = chunk.getTile(loc.get(0, -1)).getWalls();
             for (int i = 0; i < size; i++){
-                walls[i][0] = neighbor[i][0];
+                walls[i][0] = neighbor[i][size-1];
             }
         }
-        else if (chunk.getWorld().isChunk(chunk.getLoc().get(0, -1))){
+        else if (chunk.getWorld().getChunk(chunk.getLoc().get(0, -1))!=null){
             neighbor = chunk.getWorld().getChunk(chunk.getLoc().get(0, -1)).getTile(loc.get(0, chunk.size()-1)).getWalls();
             for (int i = 0; i < size; i++){
-                walls[i][0] = neighbor[i][0];
+                walls[i][0] = neighbor[i][size-1];
             }
         }
         else {
             for (int i = 0; i < size; i++){
                 walls[i][0] = true;
             }
-            doorWidth = (int)(Math.random()*(size-2)+1); // (1 to size-1)
-            start = (int)(Math.random()*(size-2-doorWidth)+1);
-            for (int i = 0; i < doorWidth; i++){
-                walls[i+start][0] = false;
+            doorWidth = random_door();
+            if (doorWidth > 1){
+                start = (int)(Math.random()*(size-2-doorWidth)+1);
+                for (int i = 0; i < doorWidth && i + start< size-1; i++){
+                    walls[i+start][0] = false;
+                }
             }
+            
         }
         
         //set left wall
         if (loc.getX() > 0){
             neighbor = chunk.getTile(loc.get(-1, 0)).getWalls();
-            System.arraycopy(neighbor[0], 0, walls[0], 0, size);
+            System.arraycopy(neighbor[size-1], 0, walls[0], 0, size);
         }
-        else if (chunk.getWorld().isChunk(chunk.getLoc().get(-1, 0))){
+        else if (chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0))!=null){
             neighbor = chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0)).getTile(loc.get(chunk.size()-1, 0)).getWalls();
-            System.arraycopy(neighbor[0], 0, walls[0], 0, size);
+            System.arraycopy(neighbor[size-1], 0, walls[0], 0, size);
         }
         else {
             for (int i = 0; i < size; i++){
                 walls[0][i] = true;
             }
-            doorWidth = (int)(Math.random()*(size-2)+1); // (1 to size-1)
-            start = (int)(Math.random()*(size-2-doorWidth)+1);
-            for (int i = 0; i < doorWidth; i++){
-                walls[0][i+start] = false;
-            }
+            doorWidth = random_door();
+            if (doorWidth > 1){
+                start = (int)(Math.random()*(size-2-doorWidth)+1);
+                for (int i = 0; i < doorWidth && i + start < size-1; i++){
+                    walls[0][i+start] = false;
+                }
+            }       
         }
         
         //set bottom wall
-        for (int i = 0; i < size; i++){
+        if (loc.getY() == chunk.size()-1 && chunk.getWorld().getChunk(chunk.getLoc().get(0, 1))!=null){
+            neighbor = chunk.getWorld().getChunk(chunk.getLoc().get(0, 1)).getTile(loc.get(0, 1-chunk.size())).getWalls();
+            for (int i = 0; i < size; i++){
+                walls[i][size-1] = neighbor[i][0];
+            }
+        }
+        else {
+            for (int i = 0; i < size; i++){
                 walls[i][size-1] = true;
             }
-        doorWidth = (int)(Math.random()*(size-2)+1); // (1 to size-1)
-        start = (int)(Math.random()*(size-2-doorWidth)+1);
-        for (int i = 0; i < doorWidth; i++){
-            walls[i+start][size-1] = false;
+            doorWidth = random_door();
+            if (doorWidth > 1){
+                start = (int)(Math.random()*(size-2-doorWidth)+1);
+                for (int i = 0; i < doorWidth && i + start< size-1; i++){
+                    walls[i+start][size-1] = false;
+                }
+            }
+            
         }
         
         //set right wall
-        for (int i = 0; i < size; i++){
-            walls[size-1][i] = true;
+        if (loc.getX() == chunk.size()-1 && chunk.getWorld().getChunk(chunk.getLoc().get(1, 0))!=null){
+            neighbor = chunk.getWorld().getChunk(chunk.getLoc().get(1, 0)).getTile(loc.get(1-chunk.size(), 0)).getWalls();
+            System.arraycopy(neighbor[0], 0, walls[size-1], 0, size);
         }
-        doorWidth = (int)(Math.random()*(size-2)+1); // (1 to size-1)
-        start = (int)(Math.random()*(size-2-doorWidth)+1);
-        for (int i = 0; i < doorWidth; i++){
-            walls[size-1][i+start] = false;
+        else {
+            for (int i = 0; i < size; i++){
+                walls[size-1][i] = true;
+            }
+            doorWidth = random_door();
+            if (doorWidth > 1){
+                start = (int)(Math.random()*(size-2-doorWidth)+1);
+                for (int i = 0; i < doorWidth && i + start < size-1; i++){
+                    walls[size-1][i+start] = false;
+                }
+            }       
         }
     }
     
@@ -113,9 +147,61 @@ public class Tile {
         return loc;
     }
     
-    public void move(Loc loc, Entity e){
-        if (!walls[(int)loc.getX()][(int)loc.getY()]){
-            e.__move__(loc);
+    public void move(double x, double y, Entity e){
+        //left wall
+        if (x < 0) {
+            e.__move__(size + x - 1, y);
+            if (loc.getX() > 0){
+                e.setTile(chunk.getTile(loc.get(-1, 0)));
+            }
+            else if (chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0))!=null){
+                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0)).getTile(loc.get(chunk.size()-1, 0)));
+            }
+            else {
+                e.setTile(chunk.getWorld().load(-1, 0, this));
+            }
+        }
+        //right wall
+        else if (x >= size-1) {
+            e.__move__(x - size + 1, y);
+            if (loc.getX() < chunk.size()-1){
+                e.setTile(chunk.getTile(loc.get(1, 0)));
+            }
+            else if (chunk.getWorld().getChunk(chunk.getLoc().get(1, 0))!=null){
+                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(1, 0)).getTile(loc.get(1-chunk.size(), 0)));
+            }
+            else {
+                e.setTile(chunk.getWorld().load(1, 0, this));
+            }
+        }
+        //top wall
+        else if (y < 0) {
+            e.__move__(x, size + y - 1);
+            if (loc.getY() > 0){
+                e.setTile(chunk.getTile(loc.get(0, -1)));
+            }
+            else if (chunk.getWorld().getChunk(chunk.getLoc().get(0, -1))!=null){
+                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, -1)).getTile(loc.get(0, chunk.size()-1)));
+            }
+            else {
+                e.setTile(chunk.getWorld().load(0, -1, this));
+            }
+        }
+        //bottom wall
+        else if (y >= size-1) {
+            e.__move__(x, y - size + 1);
+            if (loc.getY() < chunk.size()-1){
+                e.setTile(chunk.getTile(loc.get(0, 1)));
+            }
+            else if (chunk.getWorld().getChunk(chunk.getLoc().get(0, 1))!=null){
+                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, 1)).getTile(loc.get(0, 1-chunk.size())));
+            }
+            else {
+                e.setTile(chunk.getWorld().load(0, 1, this));
+            }
+        }
+        else if (!walls[(int)x][(int)y] && !walls[(int)(x+1)][(int)(y+1)] && !walls[(int)(x)][(int)(y+1)] && !walls[(int)(x+1)][(int)(y)]){
+            e.__move__(x, y);
         }
     }
 }

@@ -9,67 +9,19 @@ package InfiniteRPG;
  *
  * @author jay
  */
-public class Entity {
+public interface Entity {
+
     
-    private Loc loc;
+    public void move();
     
-    private Tile tile;
+    public void __move__(double x, double y);
     
-    private Sprite sprite;
+    public Tile getTile();
     
-    private Entity target;
+    public void setTile(Tile t);
     
-    private String name;
-    private int level;
+    public double getX();
     
-    private int hp;
-    
-    private int constitution;
-    private int strength;
-    private int dexterity;
-    private int agility;
-    private int spellpower;
-    
-    public Entity(Tile tile, String name, int level){
-        this.tile = tile;
-        this.name = name;
-        this.sprite = new Sprite(name);
-        this.level = level;
-        
-        target = this;
-        
-        int base_ability_score = (level) * (level);
-        
-        constitution = base_ability_score;
-        strength = base_ability_score;
-        dexterity = base_ability_score;
-        agility = base_ability_score;
-        spellpower = base_ability_score;
-        
-        hp = 20 + level * level + constitution;
-        
-        for (int i = tile.size() + 1; i < tile.size()*tile.size(); i++){
-            if (!tile.getWalls()[i%tile.size()][i/tile.size()]){
-                loc = new Loc(i%tile.size(),i/tile.size());
-                break;
-            }
-        }
-    }
-    
-    public void move(int x, int y){
-        tile.move(loc.get(x, y), this);
-    }
-    
-    public void __move__(Loc loc){
-        this.loc = loc;
-    }
-    
-    public Tile getTile(){
-        return tile;
-    }
-    
-    public Loc getLoc(){
-        return loc;
-    }
+    public double getY();
     
 }

@@ -31,4 +31,8 @@ public class Loc {
         return y;
     }
     
+    public String toString(){
+       return "(" + x + ", " + y + ")"; 
+    }
+    
 }

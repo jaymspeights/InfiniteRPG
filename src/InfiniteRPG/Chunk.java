@@ -5,21 +5,18 @@
  */
 package InfiniteRPG;
 
+import java.io.Serializable;
+
 /**
  *
  * @author jay
  */
-public class Chunk {
+public class Chunk implements Serializable{
     private World world;
-    private int size = 10;
+    private int size;
+    private int tileSize;
     private Loc loc;
     private Tile[][] map;
-    
-    public Chunk(Loc loc, String name, World world){
-        this.loc = loc;
-        this.world = world;
-        //initialize tiles based on file stored under name.txt
-    }
     
     public int size(){
         return size;
@@ -37,16 +34,23 @@ public class Chunk {
         return map[loc.getX()][loc.getY()];
     }
     
-    public Chunk(Loc loc, World world){
+    public Chunk(Loc loc, int size, int tileSize, World world){
         this.world = world;
         this.loc = loc;
+        this.size = size;
+        this.tileSize = tileSize;
         map = new Tile[size][size];
         
         for (int i = 0; i < size; i++){
             for (int j = 0; j < size; j++){
-                map[j][i] = new Tile(new Loc(j, i), this);
+                map[j][i] = new Tile(new Loc(j, i), tileSize,this);
             }
         }
+    }
+    
+    @Override
+    public String toString(){
+        return world.name(loc);
     }
     
 }
