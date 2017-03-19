@@ -32,22 +32,25 @@ public class Loader {
     private String filename = null;
     private Boolean success = false;
     
-    public Loader(Chunk chunk){
+    public Loader(Chunk chunk) throws Exception{
         this.chunk = chunk;
         this.filename = "Chunks/"+chunk.toString()+".ser";
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(this.filename))) {
             oos.writeObject(chunk);
             this.success = true;
 	} catch (Exception e) {
+            throw e;
 	}
     }
     
-    public Loader(String filename){
+    public Loader(String filename, World world) throws Exception{
         this.filename = "Chunks/"+filename + ".ser";
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(this.filename))) {
             this.chunk = (Chunk) ois.readObject();
+            this.chunk.setWorld(world);
             this.success = true;
         } catch (Exception e) {
+            throw e;
         }
     }
 }

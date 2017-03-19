@@ -5,18 +5,20 @@
  */
 package InfiniteRPG;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author jay
  */
-public class Tile {
+public class Tile implements Serializable{
+    
+    private static final long serialVersionUID = 1L;
     
     private final Loc loc;
-    private ArrayList<Entity> entities;
     private boolean[][] walls;
-    private Chunk chunk;
+    private transient Chunk chunk;
     private int size;
     
     public Tile(Loc loc, int size, Chunk chunk){
@@ -25,6 +27,10 @@ public class Tile {
         this.loc = loc;
         walls = new boolean[size][size];
         generate();
+    }
+    
+    public void setChunk(Chunk c){
+        chunk = c;
     }
     
     public int size(){
@@ -154,7 +160,7 @@ public class Tile {
             if (loc.getX() > 0){
                 e.setTile(chunk.getTile(loc.get(-1, 0)));
             }
-            else if (chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0))!=null){
+            else if (chunk.getWorld().chunk(chunk.getLoc().get(-1, 0))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0)).getTile(loc.get(chunk.size()-1, 0)));
             }
             else {
@@ -167,7 +173,7 @@ public class Tile {
             if (loc.getX() < chunk.size()-1){
                 e.setTile(chunk.getTile(loc.get(1, 0)));
             }
-            else if (chunk.getWorld().getChunk(chunk.getLoc().get(1, 0))!=null){
+            else if (chunk.getWorld().chunk(chunk.getLoc().get(1, 0))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(1, 0)).getTile(loc.get(1-chunk.size(), 0)));
             }
             else {
@@ -180,7 +186,7 @@ public class Tile {
             if (loc.getY() > 0){
                 e.setTile(chunk.getTile(loc.get(0, -1)));
             }
-            else if (chunk.getWorld().getChunk(chunk.getLoc().get(0, -1))!=null){
+            else if (chunk.getWorld().chunk(chunk.getLoc().get(0, -1))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, -1)).getTile(loc.get(0, chunk.size()-1)));
             }
             else {
@@ -193,7 +199,7 @@ public class Tile {
             if (loc.getY() < chunk.size()-1){
                 e.setTile(chunk.getTile(loc.get(0, 1)));
             }
-            else if (chunk.getWorld().getChunk(chunk.getLoc().get(0, 1))!=null){
+            else if (chunk.getWorld().chunk(chunk.getLoc().get(0, 1))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, 1)).getTile(loc.get(0, 1-chunk.size())));
             }
             else {

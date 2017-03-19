@@ -1,5 +1,10 @@
 package InfiniteRPG;
-public class Loc {
+
+import java.io.Serializable;
+
+public class Loc implements Serializable{
+    
+    private static final long serialVersionUID = 1L;
     
     private int x;
     private int y;
@@ -31,6 +36,7 @@ public class Loc {
         return y;
     }
     
+    @Override
     public String toString(){
        return "(" + x + ", " + y + ")"; 
     }
