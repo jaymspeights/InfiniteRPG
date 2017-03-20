@@ -160,7 +160,7 @@ public class Tile implements Serializable{
             if (loc.getX() > 0){
                 e.setTile(chunk.getTile(loc.get(-1, 0)));
             }
-            else if (chunk.getWorld().chunk(chunk.getLoc().get(-1, 0))!=null){
+            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(-1, 0))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0)).getTile(loc.get(chunk.size()-1, 0)));
             }
             else {
@@ -173,7 +173,7 @@ public class Tile implements Serializable{
             if (loc.getX() < chunk.size()-1){
                 e.setTile(chunk.getTile(loc.get(1, 0)));
             }
-            else if (chunk.getWorld().chunk(chunk.getLoc().get(1, 0))!=null){
+            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(1, 0))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(1, 0)).getTile(loc.get(1-chunk.size(), 0)));
             }
             else {
@@ -186,7 +186,7 @@ public class Tile implements Serializable{
             if (loc.getY() > 0){
                 e.setTile(chunk.getTile(loc.get(0, -1)));
             }
-            else if (chunk.getWorld().chunk(chunk.getLoc().get(0, -1))!=null){
+            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(0, -1))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, -1)).getTile(loc.get(0, chunk.size()-1)));
             }
             else {
@@ -199,7 +199,7 @@ public class Tile implements Serializable{
             if (loc.getY() < chunk.size()-1){
                 e.setTile(chunk.getTile(loc.get(0, 1)));
             }
-            else if (chunk.getWorld().chunk(chunk.getLoc().get(0, 1))!=null){
+            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(0, 1))!=null){
                 e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, 1)).getTile(loc.get(0, 1-chunk.size())));
             }
             else {

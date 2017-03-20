@@ -15,7 +15,7 @@ public class World {
     private Loc center;
     private Chunk[][] map;
     private final int size = 1;
-    private final int chunkSize = 1;
+    private final int chunkSize = 2;
     private final int tileSize = 16;
     private Player player;
     
@@ -24,18 +24,38 @@ public class World {
         center = new Loc(0, 0);
         map = new Chunk[size*2+1][size*2+1];
         
+        reloadChunks();
         for (int i = -size; i <= size; i++){
             for (int j = -size; j <= size; j++){
-                map[j+size][i+size] = load(new Loc(j, i));
-            }
-        }
-        for (int i = -size; i <= size; i++){
-            for (int j = -size; j <= size; j++){
-                save(map[j+size][i+size].generate());
+                if(!map[j+size][i+size].isGenerated())
+                    save(map[j+size][i+size].generate());
             }
         }
         
         player = new Player(map[size][size].getTile(new Loc(0,0)), "Jay", 0);
+    }
+    
+    private void reloadChunks(){
+       for (int i = -size; i <= size; i++){
+            for (int j = -size; j <= size; j++){
+                map[j+size][i+size] = load(center.get(j, i));
+            }
+        } 
+    }
+    private void saveChunks(){
+        for (int i = -size; i <= size; i++){
+            for (int j = -size; j <= size; j++){
+                save(map[j+size][i+size]);
+            }
+        }
+    }
+    private void generateChunks(){
+        for (int i = -size; i <= size; i++){
+            for (int j = -size; j <= size; j++){
+                if(!map[j+size][i+size].isGenerated())
+                    map[j+size][i+size].generate();
+            }
+        }
     }
     
     public Player getPlayer(){
@@ -54,7 +74,7 @@ public class World {
         return null;
     }
     
-    public Chunk chunk(Loc loc){
+    public Chunk loaded_chunk(Loc loc){
         if (isChunk(loc))
             return map[loc.getX() - center.getX() + size][loc.getY() - center.getY() + size];
         return null;
@@ -68,19 +88,9 @@ public class World {
     
     public Tile load(int x, int y, Tile tile){
         center = tile.getChunk().getLoc().get(x, y);
-        System.out.println(center);
-        for (int i = -size; i <= size; i++){
-            for (int j = -size; j <= size; j++){
-                save(map[j+size][i+size]);
-                map[j+size][i+size] = load(new Loc(j + center.getX(), i + center.getY()));
-            }
-        }
-        System.out.println();
-        for (int i = -size; i <= size; i++){
-            for (int j = -size; j <= size; j++){
-                map[j+size][i+size].generate();
-            }
-        }
+        saveChunks();
+        reloadChunks();
+        generateChunks();
         return map[size][size].getTile(tile.getLoc().get(x*(1-chunkSize), y*(1-chunkSize)));
     }
     
