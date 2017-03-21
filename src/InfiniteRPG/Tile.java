@@ -6,7 +6,6 @@
 package InfiniteRPG;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  *
@@ -153,61 +152,73 @@ public class Tile implements Serializable{
         return loc;
     }
     
-    public void move(double x, double y, Entity e){
-        //left wall
-        if (x < 0) {
-            e.__move__(size + x - 1, y);
-            if (loc.getX() > 0){
-                e.setTile(chunk.getTile(loc.get(-1, 0)));
+    public boolean move(double x, double y, Entity e){
+        if (e instanceof Creature){
+            //left wall
+            if (x < 0) {
+                e.__move__(size + x - 1, y);
+                if (loc.getX() > 0){
+                    e.setTile(chunk.getTile(loc.get(-1, 0)));
+                }
+                else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(-1, 0))!=null){
+                    e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0)).getTile(loc.get(chunk.size()-1, 0)));
+                }
+                else {
+                    e.setTile(chunk.getWorld().load(-1, 0, this));
+                }
             }
-            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(-1, 0))!=null){
-                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(-1, 0)).getTile(loc.get(chunk.size()-1, 0)));
+            //right wall
+            else if (x >= size-1) {
+                e.__move__(x - size + 1, y);
+                if (loc.getX() < chunk.size()-1){
+                    e.setTile(chunk.getTile(loc.get(1, 0)));
+                }
+                else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(1, 0))!=null){
+                    e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(1, 0)).getTile(loc.get(1-chunk.size(), 0)));
+                }
+                else {
+                    e.setTile(chunk.getWorld().load(1, 0, this));
+                }
+            }
+            //top wall
+            else if (y < 0) {
+                e.__move__(x, size + y - 1);
+                if (loc.getY() > 0){
+                    e.setTile(chunk.getTile(loc.get(0, -1)));
+                }
+                else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(0, -1))!=null){
+                    e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, -1)).getTile(loc.get(0, chunk.size()-1)));
+                }
+                else {
+                    e.setTile(chunk.getWorld().load(0, -1, this));
+                }
+            }
+            //bottom wall
+            else if (y >= size-1) {
+                e.__move__(x, y - size + 1);
+                if (loc.getY() < chunk.size()-1){
+                    e.setTile(chunk.getTile(loc.get(0, 1)));
+                }
+                else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(0, 1))!=null){
+                    e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, 1)).getTile(loc.get(0, 1-chunk.size())));
+                }
+                else {
+                    e.setTile(chunk.getWorld().load(0, 1, this));
+                }
+            }
+            else if (!walls[(int)x][(int)y] && !walls[(int)(x+1)][(int)(y+1)] && !walls[(int)(x)][(int)(y+1)] && !walls[(int)(x+1)][(int)(y)]){
+                e.__move__(x, y);
+            }
+        }
+        else if (e instanceof Spell){
+            if (x>0&&y>0&&x<size-1&&y<size-1&&!walls[(int)x][(int)y] && !walls[(int)(x+1)][(int)(y+1)] && !walls[(int)(x)][(int)(y+1)] && !walls[(int)(x+1)][(int)(y)]){
+                e.__move__(x, y);
             }
             else {
-                e.setTile(chunk.getWorld().load(-1, 0, this));
+                ((Spell)e).fizzle();
+                return false;
             }
         }
-        //right wall
-        else if (x >= size-1) {
-            e.__move__(x - size + 1, y);
-            if (loc.getX() < chunk.size()-1){
-                e.setTile(chunk.getTile(loc.get(1, 0)));
-            }
-            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(1, 0))!=null){
-                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(1, 0)).getTile(loc.get(1-chunk.size(), 0)));
-            }
-            else {
-                e.setTile(chunk.getWorld().load(1, 0, this));
-            }
-        }
-        //top wall
-        else if (y < 0) {
-            e.__move__(x, size + y - 1);
-            if (loc.getY() > 0){
-                e.setTile(chunk.getTile(loc.get(0, -1)));
-            }
-            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(0, -1))!=null){
-                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, -1)).getTile(loc.get(0, chunk.size()-1)));
-            }
-            else {
-                e.setTile(chunk.getWorld().load(0, -1, this));
-            }
-        }
-        //bottom wall
-        else if (y >= size-1) {
-            e.__move__(x, y - size + 1);
-            if (loc.getY() < chunk.size()-1){
-                e.setTile(chunk.getTile(loc.get(0, 1)));
-            }
-            else if (chunk.getWorld().loaded_chunk(chunk.getLoc().get(0, 1))!=null){
-                e.setTile(chunk.getWorld().getChunk(chunk.getLoc().get(0, 1)).getTile(loc.get(0, 1-chunk.size())));
-            }
-            else {
-                e.setTile(chunk.getWorld().load(0, 1, this));
-            }
-        }
-        else if (!walls[(int)x][(int)y] && !walls[(int)(x+1)][(int)(y+1)] && !walls[(int)(x)][(int)(y+1)] && !walls[(int)(x+1)][(int)(y)]){
-            e.__move__(x, y);
-        }
+        return true;
     }
 }

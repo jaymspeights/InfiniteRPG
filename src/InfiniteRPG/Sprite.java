@@ -6,6 +6,8 @@
 package InfiniteRPG;
 
 import java.awt.Image;
+import java.io.File;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -15,11 +17,15 @@ public class Sprite {
     private String name;
     private Image image;
     
-    public Sprite(String name){
+    public Sprite(String name, int size){
         this.name = name;
+        try {
+            image = ImageIO.read(new File("Sprites/"+name)).getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        } catch (Exception e) {
+        }
     }
     
-    private Image getImage(){
+    public Image getImage(){
         return image;
     }
 }

@@ -11,103 +11,38 @@ import java.awt.event.KeyEvent;
  *
  * @author Jay Speights
  */
-public class Player implements Entity{
-
-    private Tile tile;
-    private final String name;
-    private final Sprite sprite;
-    private int level;
-    
-    private int constitution;
-    private int strength;
-    private int dexterity;
-    private int agility;
-    private int spellpower;
-    private int hp;
-    
-    private double x;
-    private double y;
+public class Player extends Creature{
     
     private double dx;
     private double dy;
-    private double speed;
     
     public Player(Tile tile, String name, int level){
-        this.tile = tile;
-        this.name = name;
-        this.sprite = new Sprite(name);
-        this.level = level;
-        
-        speed = .2;
-        
-        int base_ability_score = (level) * (level);
-        
-        constitution = base_ability_score;
-        strength = base_ability_score;
-        dexterity = base_ability_score;
-        agility = base_ability_score;
-        spellpower = base_ability_score;
-        
-        hp = 20 + level * level + constitution;
-        
-        for (int i = tile.size() + 1; i < tile.size()*tile.size(); i++){
-            if (!tile.getWalls()[i%tile.size()][i/tile.size()]){
-                x = i%tile.size();
-                y = i/tile.size();
-                break;
-            }
-        }
+        super(tile, name, level);
     }
     
     @Override
-    public void move(){
+    public boolean move(){
         if (dx != 0 || dy != 0)
-            tile.move(dx + x, dy + y, this);
+            return getTile().move(dx + getX(), dy + getY(), this);
+        return true;
     }
-    
-    @Override
-    public void __move__(double x, double y){
-        this.x = x;
-        this.y = y;
-    }
-    
-    @Override
-    public Tile getTile(){
-        return tile;
-    }
-    
-    @Override
-    public void setTile(Tile t){
-        tile = t;
-    }
-    
-    @Override
-    public double getX(){
-        return x;
-    }
-    
-    @Override
-    public double getY(){
-        return y;
-    }
-
 
     public void keyPressed(KeyEvent e) {
         switch (Character.toLowerCase(e.getKeyChar())){
             case 'w':
-                dy = -speed;
+                dy = -getSpeed();
                 break;
                 
             case 'a':
-                dx = -speed;
+                dx = -getSpeed();
                 break;
                 
             case 's':
-                dy = speed;
+                dy = getSpeed();
                 break;
                 
             case 'd':
-                dx = speed;
+                dx = getSpeed();
                 break;
         }
     }

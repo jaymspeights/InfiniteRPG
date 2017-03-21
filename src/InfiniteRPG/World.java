@@ -5,6 +5,9 @@
  */
 package InfiniteRPG;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
+
 
 /**
  *
@@ -14,10 +17,13 @@ public class World {
     
     private Loc center;
     private Chunk[][] map;
-    private final int size = 1;
-    private final int chunkSize = 2;
-    private final int tileSize = 16;
+    private final int size = 3;
+    private final int chunkSize = 5;
+    private final int tileSize = 32;
     private Player player;
+    private ArrayList<Creature> creatures = new ArrayList();
+    private ArrayList<Spell> spells = new ArrayList();
+    private int scale;
     
     
     public World(){
@@ -32,7 +38,7 @@ public class World {
             }
         }
         
-        player = new Player(map[size][size].getTile(new Loc(0,0)), "Jay", 0);
+        creatures.add(player = new Player(map[size][size].getTile(new Loc(0,0)), "Jay", 0));
     }
     
     private void reloadChunks(){
@@ -49,6 +55,34 @@ public class World {
             }
         }
     }
+    
+    public void setScale(int s){
+        scale = s;
+    }
+    
+    public int getScale(){
+        return scale;
+    }
+    
+    public void addCreature(Creature e){
+        creatures.add(e);
+    }
+    
+    public void removeCreature(Creature e){
+        creatures.remove(e);
+    }
+    
+    public void addSpell(Spell s){
+        spells.add(s);
+    }
+    
+    public void removeSpell(Spell s){
+        spells.remove(s);
+    }
+    public ArrayList<Spell> getSpells(){
+        return spells;
+    }
+    
     private void generateChunks(){
         for (int i = -size; i <= size; i++){
             for (int j = -size; j <= size; j++){
@@ -116,5 +150,18 @@ public class World {
     
     public String name(Loc loc){
         return "chunk"+loc.getX()+"x"+loc.getY()+"y";
+    }
+    
+    public void step(){
+        ListIterator<Creature> lic = creatures.listIterator();
+        while (lic.hasNext()){
+            if(!lic.next().move())
+                lic.remove();
+        }
+        ListIterator<Spell> lis = spells.listIterator();
+        while (lis.hasNext()){
+            if(!lis.next().move())
+                lis.remove();
+        }
     }
 }

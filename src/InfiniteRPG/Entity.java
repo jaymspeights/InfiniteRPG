@@ -7,12 +7,10 @@ package InfiniteRPG;
 
 /**
  *
- * @author jay
+ * @author Jay Speights
  */
 public interface Entity {
-
-    
-    public void move();
+    public boolean move();
     
     public void __move__(double x, double y);
     
@@ -24,4 +22,7 @@ public interface Entity {
     
     public double getY();
     
+    public Sprite getSprite();
+    
+    public double getOffset();
 }
